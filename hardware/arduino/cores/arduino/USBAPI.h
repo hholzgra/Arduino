@@ -112,6 +112,13 @@ extern Mouse_ Mouse;
 #define KEY_F11				0xCC
 #define KEY_F12				0xCD
 
+#define KEY_NUM_LOCK			0xDB
+#define KEY_SCROLL_LOCK			0xCF
+
+#define LED_NUM_LOCK			0x01
+#define LED_CAPS_LOCK			0x02
+#define LED_SCROLL_LOCK			0x04
+
 //	Low level key report: up to 6 keys and shift, ctrl etc at once
 typedef struct
 {
@@ -125,6 +132,7 @@ class Keyboard_ : public Print
 private:
 	KeyReport _keyReport;
 	void sendReport(KeyReport* keys);
+	uint8_t _ledStatus;
 public:
 	Keyboard_(void);
 	void begin(void);
@@ -133,6 +141,8 @@ public:
 	virtual size_t press(uint8_t k);
 	virtual size_t release(uint8_t k);
 	virtual void releaseAll(void);
+	virtual void setLedStatus(uint8_t);
+	virtual uint8_t getLedStatus(void);
 };
 extern Keyboard_ Keyboard;
 

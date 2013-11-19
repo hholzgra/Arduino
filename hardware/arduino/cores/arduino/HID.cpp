@@ -93,9 +93,20 @@ const u8 _hidReportDescriptor[] = {
     0x81, 0x02,                    //   INPUT (Data,Var,Abs)
     0x95, 0x01,                    //   REPORT_COUNT (1)
     0x75, 0x08,                    //   REPORT_SIZE (8)
+
     0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
     
-	0x95, 0x06,                    //   REPORT_COUNT (6)
+    0x95, 0x05,                    //   REPORT_COUNT (5)
+    0x75, 0x01,                    //   REPORT_SIZE (1)
+    0x05, 0x08,                    //   USAGE_PAGE (LEDs)
+    0x19, 0x01,                    //   USAGE_MINIMUM (1)
+    0x29, 0x05,                    //   USAGE_MAXIMUM (5)
+    0x91, 0x02,                    //   OUTPUT (Data,Var,Abs) // LED report
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x75, 0x03,                    //   REPORT_SIZE (3)
+    0x91, 0x01,                    //   OUTPUT (Constant) // padding 
+
+       0x95, 0x06,                    //   REPORT_COUNT (6)
     0x75, 0x08,                    //   REPORT_SIZE (8)
     0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
     0x25, 0x65,                    //   LOGICAL_MAXIMUM (101)
@@ -192,6 +203,18 @@ bool WEAK HID_Setup(Setup& setup)
 		{
 			_hid_idle = setup.wValueL;
 			return true;
+		}
+
+		if (HID_SET_REPORT == r)
+		{
+			if (setup.wLength == 2) 
+			{
+				uint8_t data[2];
+				if (2 == USB_RecvControl(data, 2)) 
+				{
+					Keyboard.setLedStatus(data[1]);
+				}
+			}
 		}
 	}
 	return false;
@@ -513,6 +536,16 @@ size_t Keyboard_::write(uint8_t c)
 	uint8_t p = press(c);		// Keydown
 	uint8_t r = release(c);		// Keyup
 	return (p);					// just return the result of press() since release() almost always returns 1
+}
+
+void Keyboard_::setLedStatus(uint8_t s)
+{
+	_ledStatus = s;
+}
+
+uint8_t Keyboard_::getLedStatus(void)
+{
+	return _ledStatus;
 }
 
 #endif
